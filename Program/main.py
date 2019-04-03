@@ -3,10 +3,10 @@ def calculate_prime_implicants(numberofVariables, mainTerms, dontCare):
     primeImplicants = []
     reducedElements = makegroups(numberofVariables, mainTerms, dontCare)
     while not allCalculated:
-        primeImplicants, reducedElements, allCalculated = addPrimeImplicants( primeImplicants, reducedElements, allCalculated)
+        primeImplicants, reducedElements, allCalculated = addPrimeImplicants(primeImplicants, reducedElements, allCalculated)
     primeImplicants = destroyRepetition(primeImplicants)
     primeImplicants = changeRepresentation(primeImplicants, numberOfVariables)
-    primeImplicants = rowAndColumnDominance(primeImplicants)
+    primeImplicants = rowAndColumnDominance(primeImplicants, dontCare,numberOfVariables)
     return primeImplicants
 
 
@@ -122,7 +122,7 @@ def changeRepresentation(primeImplicants,numberOfVariables):
         binaryArray[i] = swapWithX(primeImplicants[i], binaryArray[i])
     return binaryArray
 
-def changeToBinary(number,numberOfVariables):
+def changeToBinary(number, numberOfVariables):
     string = ''
     while number != 1:
         string += str(number%2)
@@ -143,7 +143,12 @@ def swapWithX(dontCareBits, string):
     return string
 
 
-def rowAndColumnDominance(primeImplicants):
+def rowAndColumnDominance(primeImplicants, dontCare,numberOfVariables):
+    primeImplicants = removelessers1(primeImplicants)
+    #primeImplicants = removelessers2(primeImplicants, dontCare,numberOfVariables)
+    return primeImplicants
+
+def removelessers1(primeImplicants):
     for i in primeImplicants[:]:
         temp = []
         temp.clear()
@@ -163,8 +168,56 @@ def rowAndColumnDominance(primeImplicants):
     return primeImplicants
 
 
+def removelessers2(primeImplicants, dontCare, numberOfVariables):
+    primeImplicants = expand(primeImplicants)
+    primeImplicants = removeDuplicates(primeImplicants)
+    dontCare = removeDontCare(dontCare, numberOfVariables)
+    primeImplicants = contract(primeImplicants, dontCare)
+    return primeImplicants
+
+
+def expand(primeImplicants):
+    expanded = False
+    while not expanded:
+        expanded = True
+        temp = []
+        for Implicant in primeImplicants[:]:
+            if 'x' in Implicant:
+                expanded = False
+                temp.append(Implicant.replace('x', '0', 1))
+                temp.append(Implicant.replace('x', '1', 1))
+            else:
+                temp.append(Implicant)
+        primeImplicants = temp
+    return primeImplicants
+
+
+def removeDuplicates(primeImplicants):
+    for x in primeImplicants:
+        count = 0
+        for j in primeImplicants:
+            if x == j and count:
+                primeImplicants.remove(j)
+            elif x == j and not count:
+                count = 1
+    return primeImplicants
+
+
+def removeDontCare(dontCare, numberOfVariables):
+    temp = []
+    for x in dontCare:
+        temp.append(changeToBinary(x, numberOfVariables))
+    dontCare = temp
+
+
+def contract(primeImplicant, dontCare):
+
+
+
 numberOfVariables = int(input())
 mainTerms = list(map(int, input().split()))
 dontCare = list(map(int, input().split()))
+if dontCare[0] == -1:
+    dontCare.clear()
 primeImplicants = calculate_prime_implicants(numberOfVariables, mainTerms, dontCare)
 print(primeImplicants)
