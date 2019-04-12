@@ -380,10 +380,12 @@ while start:
         numberOfVariables = input()
     numberOfVariables = int(numberOfVariables)
     notCorrect = True
+    minTerms = []
+    dontCare = []
     while notCorrect:
         notCorrect = False
-        mainTerms, dontCare = getInput(numberOfVariables)
-        for x in mainTerms:
+        minTerms, dontCare = getInput(numberOfVariables)
+        for x in minTerms:
             if x < 0 or x >= 2**numberOfVariables:
                 notCorrect = True
         for x in dontCare:
@@ -394,7 +396,7 @@ while start:
 
     if dontCare[0] == -1:
         dontCare.clear()
-    primeImplicants = calculate_prime_implicants(numberOfVariables, mainTerms, dontCare)
+    primeImplicants = calculate_prime_implicants(numberOfVariables, minTerms, dontCare)
     print("Prime Implicants Minimized Are:", end=' ')
     for x in primeImplicants:
         print(x, end=' ')
